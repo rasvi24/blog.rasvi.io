@@ -1,17 +1,43 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.2">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2023-05-20T00:28:28+05:30</updated><id>/feed.xml</id><title type="html">Your awesome title</title><subtitle>Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.</subtitle><entry><title type="html">Welcome to Jekyll!</title><link href="/jekyll/update/2023/05/19/welcome-to-jekyll.html" rel="alternate" type="text/html" title="Welcome to Jekyll!" /><published>2023-05-19T23:56:59+05:30</published><updated>2023-05-19T23:56:59+05:30</updated><id>/jekyll/update/2023/05/19/welcome-to-jekyll</id><content type="html" xml:base="/jekyll/update/2023/05/19/welcome-to-jekyll.html"><![CDATA[<p>You’ll find this post in your <code class="language-plaintext highlighter-rouge">_posts</code> directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run <code class="language-plaintext highlighter-rouge">jekyll serve</code>, which launches a web server and auto-regenerates your site when a file is updated.</p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.2">Jekyll</generator><link href="https://blog.rasvi.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://blog.rasvi.io/" rel="alternate" type="text/html" /><updated>2023-05-20T12:28:36+05:30</updated><id>https://blog.rasvi.io/feed.xml</id><title type="html">blog.rasvi.io</title><subtitle>I experiment any technologies that interests me. Some of the technologies I work with are AWS, Kubernetes, Java EE, Spring Boot, Python and Javascript. I make myself to write them here.</subtitle><entry><title type="html">Vert.x 4 Future</title><link href="https://blog.rasvi.io/java/2023/05/20/vertx4-future.html" rel="alternate" type="text/html" title="Vert.x 4 Future" /><published>2023-05-20T11:07:00+05:30</published><updated>2023-05-20T11:07:00+05:30</updated><id>https://blog.rasvi.io/java/2023/05/20/vertx4-future</id><content type="html" xml:base="https://blog.rasvi.io/java/2023/05/20/vertx4-future.html"><![CDATA[<p>Vert.x is a highly performant asynchronous library. It is a great fit for IO heavy applications. Good thing about vert.x is, it is just a library that you can create the objects anywhere and use it out of the box. You can easily embed this to your application. Vert.x 4 has added Future support. This Future <span><code>io.vertx.core.Future</code></span> is not same as <span><code>java.util.concurrent.Future</code></span> You can refer the javadoc <a target="_blank" href="https://vertx.io/docs/apidocs/io/vertx/core/Future.html">here</a>.</p>
+<p>You need to include the maven dependency. Or you can clone this <a href="https://github.com/rasvi24/vertx-web-future">repository</a></p>
+<pre>
+&#x3C;dependency&#x3E;
+  &#x3C;groupId&#x3E;io.vertx&#x3C;/groupId&#x3E;
+  &#x3C;artifactId&#x3E;vertx-web-client&#x3C;/artifactId&#x3E;
+  &#x3C;version&#x3E;4.4.2&#x3C;/version&#x3E;
+&#x3C;/dependency&#x3E;
+</pre>
+<p>Every asynchronous operation method from Vert.x has an alternate version of it to return a Future. Prior to Vert.x 4 every asynchronous operation needs to be passed a callback which leads to callback hell. Lets look at a http client usage.</p>
+<h4>Vert.x 3 callback</h4>
+<pre>
+client.getAbs(url).send(response -&#x3E; {
+  System.out.println(&#x22;Response: &#x22;+ response);
+});
+</pre>
+<h4>Vert.x 4 Future</h4>
+<pre>
+Future&#x3C;HttpResponse&#x3C;Buffer&#x3E;&#x3E; future = client.getAbs(url).send();
+future.onComplete(response -&#x3E; {
+  System.out.println(&#x22;Response: &#x22; + response);
+});
+</pre>
 
-<p>Jekyll requires blog post files to be named according to the following format:</p>
+<p>They both seem to be similar at first. The Future version still has callback for onComplete. This is very useful when we pass around the future to different part of the code and continue the completion there. This usage avoids callback hell or nesting callbacks on multiple levels.</p>
+<h4>compose</h4>
+<p>Let's take an example with a shortened link. On hitting the shortened link gives the original link. This means we need to perform two asynchronous operations and the second operation is dependant on the first operation. This can be written in Vert.x 4 without nesting callbacks.</p>
+<pre>
+Future&#x3C;HttpResponse&#x3C;Buffer&#x3E;&#x3E; future = client.getAbs(shortLink).send();
+future.compose(resp -&#x3E; {
+    String originalLink = resp.bodyAsString();
+    return client.getAbs(originalLink).send();
+});</pre>
+<p>The compose method from Future returns another Future. it is useful to chain multiple dependant operations as if they were written line by line in a blocking java code. This Future object now can be returned to anywhere in the code to execute different operation with the result of it.</p>
 
-<p><code class="language-plaintext highlighter-rouge">YEAR-MONTH-DAY-title.MARKUP</code></p>
-
-<p>Where <code class="language-plaintext highlighter-rouge">YEAR</code> is a four-digit number, <code class="language-plaintext highlighter-rouge">MONTH</code> and <code class="language-plaintext highlighter-rouge">DAY</code> are both two-digit numbers, and <code class="language-plaintext highlighter-rouge">MARKUP</code> is the file extension representing the format used in the file. After that, include the necessary front matter. Take a look at the source for this post to get an idea about how it works.</p>
-
-<p>Jekyll also offers powerful support for code snippets:</p>
-
-<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">print_hi</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span>
-  <span class="nb">puts</span> <span class="s2">"Hi, </span><span class="si">#{</span><span class="nb">name</span><span class="si">}</span><span class="s2">"</span>
-<span class="k">end</span>
-<span class="n">print_hi</span><span class="p">(</span><span class="s1">'Tom'</span><span class="p">)</span>
-<span class="c1">#=&gt; prints 'Hi, Tom' to STDOUT.</span></code></pre></figure>
-
-<p>Check out the <a href="https://jekyllrb.com/docs/home">Jekyll docs</a> for more info on how to get the most out of Jekyll. File all bugs/feature requests at <a href="https://github.com/jekyll/jekyll">Jekyll’s GitHub repo</a>. If you have questions, you can ask them on <a href="https://talk.jekyllrb.com/">Jekyll Talk</a>.</p>]]></content><author><name></name></author><category term="jekyll" /><category term="update" /><summary type="html"><![CDATA[You’ll find this post in your _posts directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run jekyll serve, which launches a web server and auto-regenerates your site when a file is updated.]]></summary></entry></feed>
+<h4>map</h4>
+<p>You can use map method to transform the result of the future. The mapping operation is done asynchronously when the result is available.</p>
+<pre>
+public Future&#x3C;JsonObject&#x3E; fetchJsonData(WebClient client, String url) {
+  Future&#x3C;HttpResponse&#x3C;Buffer&#x3E;&#x3E; future = client.getAbs(url).send();
+  return future.map(res -&#x3E; res.bodyAsJsonObject());
+}
+</pre>]]></content><author><name>Mohamed Rasvi</name></author><category term="java" /><summary type="html"><![CDATA[Vert.x is a highly performant asynchronous library. It is a great fit for IO heavy applications. Good thing about vert.x is, it is just a library that you can create the objects anywhere and use it out of the box. You can easily embed this to your application. Vert.x 4 has added Future support. This Future io.vertx.core.Future is not same as java.util.concurrent.Future You can refer the javadoc here. You need to include the maven dependency. Or you can clone this repository &#x3C;dependency&#x3E; &#x3C;groupId&#x3E;io.vertx&#x3C;/groupId&#x3E; &#x3C;artifactId&#x3E;vertx-web-client&#x3C;/artifactId&#x3E; &#x3C;version&#x3E;4.4.2&#x3C;/version&#x3E; &#x3C;/dependency&#x3E; Every asynchronous operation method from Vert.x has an alternate version of it to return a Future. Prior to Vert.x 4 every asynchronous operation needs to be passed a callback which leads to callback hell. Lets look at a http client usage. Vert.x 3 callback client.getAbs(url).send(response -&#x3E; { System.out.println(&#x22;Response: &#x22;+ response); }); Vert.x 4 Future Future&#x3C;HttpResponse&#x3C;Buffer&#x3E;&#x3E; future = client.getAbs(url).send(); future.onComplete(response -&#x3E; { System.out.println(&#x22;Response: &#x22; + response); });]]></summary></entry></feed>
