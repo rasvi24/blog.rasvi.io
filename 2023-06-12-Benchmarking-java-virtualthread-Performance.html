@@ -1,4 +1,66 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.2">Jekyll</generator><link href="https://blog.rasvi.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://blog.rasvi.io/" rel="alternate" type="text/html" /><updated>2023-06-12T00:38:35+05:30</updated><id>https://blog.rasvi.io/feed.xml</id><title type="html">blog.rasvi.io</title><subtitle>I experiment any technologies that interests me. Some of the technologies I work with are AWS, Kubernetes, Java EE, Spring Boot, Python and Javascript. I make myself to write them here.</subtitle><entry><title type="html">Benchmarking Java Virtual Thread Performance</title><link href="https://blog.rasvi.io/2023-06-12-Benchmarking-java-virtualthread-Performance" rel="alternate" type="text/html" title="Benchmarking Java Virtual Thread Performance" /><published>2023-06-12T00:36:00+05:30</published><updated>2023-06-12T00:36:00+05:30</updated><id>https://blog.rasvi.io/exploring-java-virutalthread-concurrency</id><content type="html" xml:base="https://blog.rasvi.io/2023-06-12-Benchmarking-java-virtualthread-Performance"><![CDATA[<script>
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Benchmarking Java Virtual Thread Performance | blog.rasvi.io</title>
+<meta name="generator" content="Jekyll v4.3.2" />
+<meta property="og:title" content="Benchmarking Java Virtual Thread Performance" />
+<meta name="author" content="Mohamed Rasvi" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Virtual thread is set to be released in JDK 21. This feature will bring significant benefits to many IO-bound frameworks. It will alleviate the burden on Java developers like me from having to write reactive-style code. The following tests have been conducted using JDK 21 EA build 25. CPU: Ryzen 4800H mobile." />
+<meta property="og:description" content="Virtual thread is set to be released in JDK 21. This feature will bring significant benefits to many IO-bound frameworks. It will alleviate the burden on Java developers like me from having to write reactive-style code. The following tests have been conducted using JDK 21 EA build 25. CPU: Ryzen 4800H mobile." />
+<link rel="canonical" href="https://blog.rasvi.io/2023-06-12-Benchmarking-java-virtualthread-Performance" />
+<meta property="og:url" content="https://blog.rasvi.io/2023-06-12-Benchmarking-java-virtualthread-Performance" />
+<meta property="og:site_name" content="blog.rasvi.io" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2023-06-12T00:36:00+05:30" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Benchmarking Java Virtual Thread Performance" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Mohamed Rasvi"},"dateModified":"2023-06-12T00:36:00+05:30","datePublished":"2023-06-12T00:36:00+05:30","description":"Virtual thread is set to be released in JDK 21. This feature will bring significant benefits to many IO-bound frameworks. It will alleviate the burden on Java developers like me from having to write reactive-style code. The following tests have been conducted using JDK 21 EA build 25. CPU: Ryzen 4800H mobile.","headline":"Benchmarking Java Virtual Thread Performance","mainEntityOfPage":{"@type":"WebPage","@id":"https://blog.rasvi.io/2023-06-12-Benchmarking-java-virtualthread-Performance"},"url":"https://blog.rasvi.io/2023-06-12-Benchmarking-java-virtualthread-Performance"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://blog.rasvi.io/feed.xml" title="blog.rasvi.io" /><script async src="https://www.googletagmanager.com/gtag/js?id=G-76YBPTXB5Y"></script>
+<script>
+  window['ga-disable-G-76YBPTXB5Y'] = window.doNotTrack === "1" || navigator.doNotTrack === "1" || navigator.doNotTrack === "yes" || navigator.msDoNotTrack === "1";
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){window.dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-76YBPTXB5Y');
+</script>
+
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">blog.rasvi.io</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About (Mohamed Rasvi)</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Benchmarking Java Virtual Thread Performance</h1>
+    <p class="post-meta"><time class="dt-published" datetime="2023-06-12T00:36:00+05:30" itemprop="datePublished">
+        Jun 12, 2023
+      </time>• 
+          <span itemprop="author" itemscope itemtype="http://schema.org/Person">
+            <span class="p-author h-card" itemprop="name">Mohamed Rasvi</span></span></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <script>
     (function init() {
         styles = `
         p {
@@ -347,269 +409,37 @@ Transfer/sec:     82.46KB
 <p>250MB to handle 25k HTTP connections. With -Xmx300m, the max RSS is down to 484MB. This is unreal. I had to increment a counter inside the handler to verify if it actually dispatches that many requests. Yes I counted 25k requests dispatching on the server. Comparing RSS value of Vert.x's <b>484MB</b> to Axum's <b>537MB</b>, I hereby declare Java uses less memory than Rust in this scenario :).</p>
 <p>
 
-</p>It is worth mentioning that there might be optimizations that can be done in Rust, or perhaps there are other Rust frameworks that can perform better than Vert.x. The primary goal here is not optimization or prove what is efficient, but rather to observe how the framework/language handles threads when the code is written without any intent for optimization or performance profiling. The Rust comparison is simply used as a reference to evaluate the effectiveness of Java's virtual threads :).</p>]]></content><author><name>Mohamed Rasvi</name></author><category term="java" /><summary type="html"><![CDATA[Virtual thread is set to be released in JDK 21. This feature will bring significant benefits to many IO-bound frameworks. It will alleviate the burden on Java developers like me from having to write reactive-style code. The following tests have been conducted using JDK 21 EA build 25. CPU: Ryzen 4800H mobile.]]></summary></entry><entry><title type="html">A Web Component Intro with Example</title><link href="https://blog.rasvi.io/2023-05-21-webcomponent-intro-with-example" rel="alternate" type="text/html" title="A Web Component Intro with Example" /><published>2023-05-21T02:12:00+05:30</published><updated>2023-05-21T02:12:00+05:30</updated><id>https://blog.rasvi.io/web-components</id><content type="html" xml:base="https://blog.rasvi.io/2023-05-21-webcomponent-intro-with-example"><![CDATA[<p>I will demonstrate writing a web component by implementing tabbed panels. The finished tabs will look like below. You can find the source code in this <a target="_blank" href="https://github.com/rasvi24/wc-intro">repository</a>.</p>
-<img src="/assets/images/wc/tab-code-prev.png" />
-<p>Web Component is a standard built into the browser. At the time of writing every major browser supports this feature. It is an underrated feature and often shadowed by popular SPA frameworks like React and Angular. I say this feature is underrated because WC (Web Component) predates React and it does not require importing any external libraries. Enough of history lets see how to write a component.</p>
-<p>A WC needs two steps.</p>
-<ol>
-  <li>A class that extends HTMLElement.</li>
-  <li>Registering the component as a custom element.</li>
-</ol>
-<pre>
-&#x3C;!DOCTYPE html&#x3E;
-&#x3C;html&#x3E;
-&#x3C;head&#x3E;
-  &#x3C;script&#x3E;
-    class WCTab extends HTMLElement { } //Step 1
-    customElements.define(&#x22;wc-tab&#x22;, WCTab) //Step 2
-  &#x3C;/script&#x3E;
-&#x3C;/head&#x3E;
-&#x3C;/html&#x3E;
-</pre>
-<p>That's it. A Web Component is ready to use. In registering the WC, the name must always contain a hyphen that is the reason it is <span><code>wc-tab</code></span> instead of <span><code>wctab</code></span>. This name is what needed to use this WC. We can use it just be creating a tag with same name as below.</p>
-<pre>
-&#x3C;body&#x3E;
-  &#x3C;wc-tab&#x3E;&#x3C;/wc-tab&#x3E;
-&#x3C;/body&#x3E;
-</pre>
-<p>Opening the html in browser doesn't show anything. It is not any better than an empty div at this point. Lets write something in between the opening and close tag.</p>
-<pre>
-&#x3C;wc-tab&#x3E;
-  &#x3C;p&#x3E;Hello world!&#x3C;/p&#x3E;
-&#x3C;/wc-tab&#x3E;
-</pre>
-<p>This actually prints Hello world! in the browser!</p>
-<h3>Shadow Root</h3>
-<p>You almost always should enable shadow root in your WC. Shadow root provides scoped DOM tree with the web component as its root element. This enables us to import css styles without polluting the global scope. That means we can use css stylesheets and those styles will apply only within this custom element. Any tag with matching css selectors outside the custom component are unaffected. This can be enabled in our constructor as below.</p>
-<pre>
-class WCTab extends HTMLElement {
-  constructor() {
-    super();
-    this.shadow = this.attachShadow({ mode: &#x22;open&#x22; });
-  }
-}
-</pre>
-<p>As soon as this change is made, the hello world printed in the browser has disappeared. When shadow DOM is attached, it replaces our existing children. WC has few lifecycle callbacks, one of them is <code>connectedCallback</code>. It is called as soon as the WC is attached to dom. Lets add it!</p>
-<pre>
-class WCTab extends HTMLElement {
-  constructor() {
-      super();
-      this.shadow = this.attachShadow({ mode: &#x22;open&#x22; });
-  }
-  connectedCallback(){
-    console.log(&#x22;connected!&#x22;);
-  }
-}
-</pre>
-<p>This prints <code>connected!</code> in console when the page is refreshed.</p>
-<h3>Tab - Example</h3>
-<p>Lets define how our tab component is going to be designed. Our WC will have each tab as div. The WC should define tab and its content as shown below.</p>
-<pre>
-&#x3C;wc-tab&#x3E;
-  &#x3C;div name=&#x22;Tab 1&#x22;&#x3E;Tab 1 content&#x3C;/div&#x3E;
-  &#x3C;div name=&#x22;Tab 2&#x22;&#x3E;Tab 2 content&#x3C;/div&#x3E;
-  &#x3C;div name=&#x22;Tab 3&#x22;&#x3E;Tab 3 content&#x3C;/div&#x3E;
-&#x3C;/wc-tab&#x3E;
-</pre>
-<p>We are going to read the provided children as input and generate a UI to show them as tabs. it is possible to make each tab as its own custom element instead of div tag. We will stick with div for this example. Let's see how to access the children in our component. We are going to do this in our lifecycle method <code>connectedCallback</code></p>
-<pre>
-connectedCallback(){
-  let tabs = this.querySelectorAll(&#x22;div&#x22;);
-  console.log(tabs);
-}
-</pre>
-<p>This is how we read the children. Unfortunately this does not work. <code>connectedCallback</code> is called before the children are attached to DOM. There is no simple way to read them as soon as they are attached. We go with <code>MutationObserver</code>. This observes changes for children and calls the given callback.</p>
-<pre>
-connectedCallback() {
-  let thisNode = this;
-  let observer = new MutationObserver(function () {
-    let tabs = thisNode.querySelectorAll(&#x22;div&#x22;);
-    console.log(tabs);
-  });
-  
-  // We are only interested in the children of
-  // this component
-  observer.observe(this, { childList: true });
-}
-</pre>
+</p>It is worth mentioning that there might be optimizations that can be done in Rust, or perhaps there are other Rust frameworks that can perform better than Vert.x. The primary goal here is not optimization or prove what is efficient, but rather to observe how the framework/language handles threads when the code is written without any intent for optimization or performance profiling. The Rust comparison is simply used as a reference to evaluate the effectiveness of Java's virtual threads :).</p>
+  </div><a class="u-url" href="/2023-06-12-Benchmarking-java-virtualthread-Performance" hidden></a>
+</article>
 
-<p>Now this prints <code>NodeList(3) [div, div, div]</code>. Those three divs are the three tabs we need to work. lets add a render method to generate the UI.</p>
-<pre>
-connectedCallback() {
-  let thisNode = this;
-  let observer = new MutationObserver(function () {
-    thisNode.render();
-  });
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
 
-  // We are only interested in the children of
-  // this component
-  observer.observe(this, { childList: true });
-}
-render() {
-  let tabs = this.querySelectorAll(&#x22;div&#x22;);
-  // Generate UI
-}
-</pre>
+  <div class="wrapper">
 
-<p>Now we separated the render logic from the lifecycle method, lets write UI.</p>
-<pre>
-render() {
-  // Fetch the children as input
-  let tabs = this.querySelectorAll(&#x22;div&#x22;);
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="https://blog.rasvi.io/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>I experiment any technologies that interests me. Some of the technologies I work with are AWS, Kubernetes, Java EE, Spring Boot, Python and Javascript. I make myself to write them here.</p>
+      </div>
+    </div>
 
-  // Define basic structure
-  this.shadowRoot.innerHTML = &#x60;
-  &#x3C;div class=&#x27;tab-btn-container&#x27;&#x3E;&#x3C;/div&#x3E;
-  &#x3C;div class=&#x27;tab-panel-container&#x27;&#x3E;&#x3C;/div&#x3E;
-  &#x60;;
-  let btnContainer = this.shadowRoot.querySelector(&#x22;.tab-btn-container&#x22;);
-  let panelContainer = this.shadowRoot.querySelector(&#x22;.tab-panel-container&#x22;);
+    <div class="social-links"><ul class="social-media-list"></ul>
+</div>
 
-  for (let index = 0; index &#x3C; tabs.length; index++) {
-    let currentTab = tabs[index];
-    this.addTab(currentTab, btnContainer, panelContainer)
-  }
-}
+  </div>
 
-/**
-* @param {HTMLElement} tab
-* @param {HTMLElement} btnContainer
-* @param {HTMLElement} panelContainer
-*/
-addTab(tab, btnContainer, panelContainer) {
-  let tabBtn = document.createElement(&#x22;button&#x22;);
-  let clonedTab = tab.cloneNode(true);
-  let thisNode = this;
-  let tabName = tab.getAttribute(&#x22;name&#x22;);
-  tabBtn.textContent = tabName;
-  tabBtn.setAttribute(&#x22;name&#x22;, tabName);
-  btnContainer.appendChild(tabBtn);
-  panelContainer.appendChild(clonedTab);
-}
-</pre>
+</footer>
+</body>
 
-<p>Note <code>this.shadowRoot</code> is used to access the shadow DOM. It is available in all custom components.</p>
-<p>Next, we implement the selection state. At any time only one tab is active. Lets add a method to mark a tab active.</p>
-<pre>
-/**
-* @param {String} tabName
-*/
-activate(tabName) {
-  // Deactivate previously active tab if any
-  let activeBtn = this.shadowRoot.querySelector(&#x22;.tab-btn-container &#x3E; button.active&#x22;);
-  if (activeBtn !== null) {
-    activeBtn.classList.remove(&#x22;active&#x22;);
-  }
-  let activeTab = this.shadowRoot.querySelector(&#x22;.tab-panel-container &#x3E; div.active&#x22;);
-  if (activeTab !== null) {
-    activeTab.classList.remove(&#x22;active&#x22;);
-  }
-
-  // Mark provided tab as active
-  this.shadowRoot
-    .querySelector(&#x60;.tab-btn-container &#x3E; button[name=&#x27;${tabName}&#x27;]&#x60;)
-    .classList.add(&#x22;active&#x22;);
-
-  this.shadowRoot
-    .querySelector(&#x60;.tab-panel-container &#x3E; div[name=&#x27;${tabName}&#x27;]&#x60;)
-    .classList.add(&#x22;active&#x22;);
-}
-</pre>
-<p>This method activates a tab my adding a class active to it. This has to be triggered when the tab button is clicked. This is done as below.</p>
-<pre>
-tabBtn.addEventListener(&#x22;click&#x22;, function () {
-  thisNode.activate(tabName);
-})
-</pre>
-<p>Now we have interaction with our component, lets style it. Shadow DOM do not have a head tag, so we can directly attach style tag or link tag with stylesheets in the shadowRoot.</p>
-<pre>
-generateStyle() {
-  let style = document.createElement(&#x22;style&#x22;);
-  style.textContent =
-    &#x60;
-  *{
-    background-color: #13005A;
-    color: white;
-    font-size: 2rem;
-    font-family: sans-serif;
-  }
-  .tab-panel-container{
-    padding: 8px;
-  }
-  .tab-btn-container{
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
-  }
-  .tab-panel-container &#x3E; div {
-    display: none;
-  }
-  .tab-panel-container &#x3E; div.active{
-    display: block;
-  }
-  .tab-btn-container{
-    display: flex;
-    gap: 8px;
-  }
-  .tab-btn-container &#x3E; button{
-    background-color: #4e6183;
-    border: none;
-    outline: none;
-    color: white;
-    padding: 4px 8px;
-    border-radius: 8px;
-    cursor: pointer;
-  }
-  .tab-btn-container &#x3E; button.active{
-    background-color: #03C988;
-  }
-  &#x60;;
-  return style;
-}
-</pre>
-<p> Style is attached the same way as any other element.</p>
-<pre>
-  this.shadowRoot.appendChild(this.generateStyle())
-</pre>
-<p>Thats it. The tab component is ready. There are some concepts not used here worth mentioning are custom attribute, template and slots. Use only whatever required for the components.</p>]]></content><author><name>Mohamed Rasvi</name></author><category term="javascript" /><summary type="html"><![CDATA[I will demonstrate writing a web component by implementing tabbed panels. The finished tabs will look like below. You can find the source code in this repository. Web Component is a standard built into the browser. At the time of writing every major browser supports this feature. It is an underrated feature and often shadowed by popular SPA frameworks like React and Angular. I say this feature is underrated because WC (Web Component) predates React and it does not require importing any external libraries. Enough of history lets see how to write a component. A WC needs two steps. A class that extends HTMLElement. Registering the component as a custom element. &#x3C;!DOCTYPE html&#x3E; &#x3C;html&#x3E; &#x3C;head&#x3E; &#x3C;script&#x3E; class WCTab extends HTMLElement { } //Step 1 customElements.define(&#x22;wc-tab&#x22;, WCTab) //Step 2 &#x3C;/script&#x3E; &#x3C;/head&#x3E; &#x3C;/html&#x3E; That's it. A Web Component is ready to use. In registering the WC, the name must always contain a hyphen that is the reason it is wc-tab instead of wctab. This name is what needed to use this WC. We can use it just be creating a tag with same name as below. &#x3C;body&#x3E; &#x3C;wc-tab&#x3E;&#x3C;/wc-tab&#x3E; &#x3C;/body&#x3E; Opening the html in browser doesn't show anything. It is not any better than an empty div at this point. Lets write something in between the opening and close tag. &#x3C;wc-tab&#x3E; &#x3C;p&#x3E;Hello world!&#x3C;/p&#x3E; &#x3C;/wc-tab&#x3E; This actually prints Hello world! in the browser! Shadow Root You almost always should enable shadow root in your WC. Shadow root provides scoped DOM tree with the web component as its root element. This enables us to import css styles without polluting the global scope. That means we can use css stylesheets and those styles will apply only within this custom element. Any tag with matching css selectors outside the custom component are unaffected. This can be enabled in our constructor as below. class WCTab extends HTMLElement { constructor() { super(); this.shadow = this.attachShadow({ mode: &#x22;open&#x22; }); } } As soon as this change is made, the hello world printed in the browser has disappeared. When shadow DOM is attached, it replaces our existing children. WC has few lifecycle callbacks, one of them is connectedCallback. It is called as soon as the WC is attached to dom. Lets add it! class WCTab extends HTMLElement { constructor() { super(); this.shadow = this.attachShadow({ mode: &#x22;open&#x22; }); } connectedCallback(){ console.log(&#x22;connected!&#x22;); } } This prints connected! in console when the page is refreshed. Tab - Example Lets define how our tab component is going to be designed. Our WC will have each tab as div. The WC should define tab and its content as shown below. &#x3C;wc-tab&#x3E; &#x3C;div name=&#x22;Tab 1&#x22;&#x3E;Tab 1 content&#x3C;/div&#x3E; &#x3C;div name=&#x22;Tab 2&#x22;&#x3E;Tab 2 content&#x3C;/div&#x3E; &#x3C;div name=&#x22;Tab 3&#x22;&#x3E;Tab 3 content&#x3C;/div&#x3E; &#x3C;/wc-tab&#x3E; We are going to read the provided children as input and generate a UI to show them as tabs. it is possible to make each tab as its own custom element instead of div tag. We will stick with div for this example. Let's see how to access the children in our component. We are going to do this in our lifecycle method connectedCallback connectedCallback(){ let tabs = this.querySelectorAll(&#x22;div&#x22;); console.log(tabs); } This is how we read the children. Unfortunately this does not work. connectedCallback is called before the children are attached to DOM. There is no simple way to read them as soon as they are attached. We go with MutationObserver. This observes changes for children and calls the given callback. connectedCallback() { let thisNode = this; let observer = new MutationObserver(function () { let tabs = thisNode.querySelectorAll(&#x22;div&#x22;); console.log(tabs); }); // We are only interested in the children of // this component observer.observe(this, { childList: true }); }]]></summary></entry><entry><title type="html">Vert.x 4 Future</title><link href="https://blog.rasvi.io/2023-05-20-vertx4-future" rel="alternate" type="text/html" title="Vert.x 4 Future" /><published>2023-05-20T11:07:00+05:30</published><updated>2023-05-20T11:07:00+05:30</updated><id>https://blog.rasvi.io/vertx4-future</id><content type="html" xml:base="https://blog.rasvi.io/2023-05-20-vertx4-future"><![CDATA[<p>Vert.x is a highly performant asynchronous library. It is a great fit for IO heavy applications. Good thing about vert.x is, it is just a library that you can create the objects anywhere and use it out of the box. You can easily embed this to your application. Vert.x 4 has added Future support. This Future <span><code>io.vertx.core.Future</code></span> is not same as <span><code>java.util.concurrent.Future</code></span> You can refer the javadoc <a target="_blank" href="https://vertx.io/docs/apidocs/io/vertx/core/Future.html">here</a>.</p>
-<p>You need to include the maven dependency. Or you can clone this <a href="https://github.com/rasvi24/vertx-web-future">repository</a></p>
-<pre>
-&#x3C;dependency&#x3E;
-  &#x3C;groupId&#x3E;io.vertx&#x3C;/groupId&#x3E;
-  &#x3C;artifactId&#x3E;vertx-web-client&#x3C;/artifactId&#x3E;
-  &#x3C;version&#x3E;4.4.2&#x3C;/version&#x3E;
-&#x3C;/dependency&#x3E;
-</pre>
-<p>Every asynchronous operation method from Vert.x has an alternate version of it to return a Future. Prior to Vert.x 4 every asynchronous operation needs to be passed a callback which leads to callback hell. Lets look at a http client usage.</p>
-<h4>Vert.x 3 callback</h4>
-<pre>
-client.getAbs(url).send(response -&#x3E; {
-  System.out.println(&#x22;Response: &#x22;+ response);
-});
-</pre>
-<h4>Vert.x 4 Future</h4>
-<pre>
-Future&#x3C;HttpResponse&#x3C;Buffer&#x3E;&#x3E; future = client.getAbs(url).send();
-future.onComplete(response -&#x3E; {
-  System.out.println(&#x22;Response: &#x22; + response);
-});
-</pre>
-
-<p>They both seem to be similar at first. The Future version still has callback for onComplete. This is very useful when we pass around the future to different part of the code and continue the completion there. This usage avoids callback hell or nesting callbacks on multiple levels.</p>
-<h4>compose</h4>
-<p>Let's take an example with a shortened link. On hitting the shortened link gives the original link. This means we need to perform two asynchronous operations and the second operation is dependant on the first operation. This can be written in Vert.x 4 without nesting callbacks.</p>
-<pre>
-Future&#x3C;HttpResponse&#x3C;Buffer&#x3E;&#x3E; future = client.getAbs(shortLink).send();
-future.compose(resp -&#x3E; {
-    String originalLink = resp.bodyAsString();
-    return client.getAbs(originalLink).send();
-});</pre>
-<p>The compose method from Future returns another Future. it is useful to chain multiple dependant operations as if they were written line by line in a blocking java code. This Future object now can be returned to anywhere in the code to execute different operation with the result of it.</p>
-
-<h4>map</h4>
-<p>You can use map method to transform the result of the future. The mapping operation is done asynchronously when the result is available.</p>
-<pre>
-public Future&#x3C;JsonObject&#x3E; fetchJsonData(WebClient client, String url) {
-  Future&#x3C;HttpResponse&#x3C;Buffer&#x3E;&#x3E; future = client.getAbs(url).send();
-  return future.map(res -&#x3E; res.bodyAsJsonObject());
-}
-</pre>]]></content><author><name>Mohamed Rasvi</name></author><category term="java" /><summary type="html"><![CDATA[Vert.x is a highly performant asynchronous library. It is a great fit for IO heavy applications. Good thing about vert.x is, it is just a library that you can create the objects anywhere and use it out of the box. You can easily embed this to your application. Vert.x 4 has added Future support. This Future io.vertx.core.Future is not same as java.util.concurrent.Future You can refer the javadoc here. You need to include the maven dependency. Or you can clone this repository &#x3C;dependency&#x3E; &#x3C;groupId&#x3E;io.vertx&#x3C;/groupId&#x3E; &#x3C;artifactId&#x3E;vertx-web-client&#x3C;/artifactId&#x3E; &#x3C;version&#x3E;4.4.2&#x3C;/version&#x3E; &#x3C;/dependency&#x3E; Every asynchronous operation method from Vert.x has an alternate version of it to return a Future. Prior to Vert.x 4 every asynchronous operation needs to be passed a callback which leads to callback hell. Lets look at a http client usage. Vert.x 3 callback client.getAbs(url).send(response -&#x3E; { System.out.println(&#x22;Response: &#x22;+ response); }); Vert.x 4 Future Future&#x3C;HttpResponse&#x3C;Buffer&#x3E;&#x3E; future = client.getAbs(url).send(); future.onComplete(response -&#x3E; { System.out.println(&#x22;Response: &#x22; + response); });]]></summary></entry></feed>
+</html>
